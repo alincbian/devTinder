@@ -1,21 +1,21 @@
-const authMiddleware = ((req, res, next) => {
-    const token = 'xyz'
-    const authorizedRoute = token === 'xyz'
-    if(!authorizedRoute){
-     return res.status(401).send("unauthorized request")
-    }
+const authMiddleware = (req, res, next) => {
+  const token = "xyz";
+  const authorizedRoute = token === "xyz";
+  if (!authorizedRoute) {
+    return res.status(401).send("unauthorized request");
+  }
 
-    return next()
-})
+  return next();
+};
 
-const userAuthorize = ((req, res, next) => {
-    const token = 'abc'
-    const userAuthorizeRoute = token === 'abc'
-    if(!userAuthorizeRoute){
-        return res.status(401).send("unauthorized request")
-    }
+const userAuthorize = (req, res, next) => {
+  const token = "abc";
+  const userAuthorizeRoute = token === "abc";
+  if (!userAuthorizeRoute) {
+    return res.status(401).send("unauthorized request");
+  }
 
-    return next()
-})
+  return next();
+};
 
-module.exports = {authMiddleware, userAuthorize}
+module.exports = { authMiddleware, userAuthorize };
