@@ -1,21 +1,26 @@
-const authMiddleware = (req, res, next) => {
-  const token = "xyz";
-  const authorizedRoute = token === "xyz";
-  if (!authorizedRoute) {
-    return res.status(401).send("unauthorized request");
-  }
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-  return next();
+const userAuth = async (req, res, next) => {
+  try {
+    const { token } = req.cookies;
+
+    if (!token) throw new Error("Token is invalid!!!");
+
+    const decodedObj = await jwt.verify(token, "DEV@Tinder123");
+
+    const { _id } = decodedObj;
+
+    const user = await User.findById(_id);
+
+    if (!user) throw new Error("User not found");
+
+    res.user = user;
+
+    next();
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
 };
 
-const userAuthorize = (req, res, next) => {
-  const token = "abc";
-  const userAuthorizeRoute = token === "abc";
-  if (!userAuthorizeRoute) {
-    return res.status(401).send("unauthorized request");
-  }
-
-  return next();
-};
-
-module.exports = { authMiddleware, userAuthorize };
+module.exports = { userAuth };
