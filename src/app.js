@@ -1,30 +1,59 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const { validateSignupApi, validateLoginApi } = require("./utils/validator");
 
 const app = express();
 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const data = req.body;
   try {
-    const UPDATE_ALLOWED = ["firstName", "lastName", "emailId", "password"];
+    // Validate signup data
+    validateSignupApi(req);
 
-    const updateAllowed = Object.keys(data)?.every((item) =>
-      UPDATE_ALLOWED?.includes(item)
-    );
+    const { firstName, lastName, emailId, password } = req.body;
 
-    if (!updateAllowed) {
-      throw new Error("Update not allowed");
-    }
+    // Hashing password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User(data);
+    const newUser = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: hashedPassword,
+    });
 
     await newUser.save();
     res.send("User added successfully!");
   } catch (err) {
-    res.status(400).send("An error occurred: " + err);
+    res.status(400).send("Error: " + err?.message);
+  }
+});
+
+// Login API
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    // validate
+    validateLoginApi(emailId);
+
+    const user = await User.findOne({ emailId });
+
+    if (!user) throw new Error("Invalid credentials");
+
+    const passwordCompared = await bcrypt.compare(password, user?.password);
+
+    if (passwordCompared) {
+      res.send("Login successfully");
+    } else {
+      throw new Error("Invalid credentials");
+    }
+  } catch (err) {
+    res.status(400).send("Error: " + err?.message);
   }
 });
 
