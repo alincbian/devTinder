@@ -12,7 +12,7 @@ const {
 
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
-    const user = res?.user;
+    const user = req.user;
 
     res.send(user);
   } catch (err) {
@@ -26,7 +26,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
     validateEditData(req);
 
-    const loggedInUser = res.user;
+    const loggedInUser = req.user;
 
     Object.keys(req.body)?.forEach(
       (item) => (loggedInUser[item] = req.body[item])
@@ -51,7 +51,7 @@ profileRouter.patch("/profile/password", userAuth, async (req, res) => {
 
     const { oldPassword, newPassword } = req.body;
 
-    const loggedInUser = res?.user;
+    const loggedInUser = req.user;
 
     const isValidOldPassword = await bcrypt.compare(
       oldPassword,
