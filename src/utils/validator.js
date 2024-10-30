@@ -24,6 +24,7 @@ const validateEditData = (req) => {
     "photoUrl",
     "skills",
     "about",
+    "gender",
   ];
 
   const allowed = Object.keys(req.body)?.every((item) =>
